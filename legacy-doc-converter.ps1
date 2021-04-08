@@ -3,10 +3,8 @@
 	param([string]$Description,[string]$Directory,[string]$Filter="All Files (*.*)|*.*")
 	[System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
 	$objForm = New-Object System.Windows.Forms.FolderBrowserDialog
-	#$objForm.InitialDirectory = $Directory
-	#$objForm.Filter = $Filter
-    $objForm.RootFolder = "Desktop"
-    $objForm.Description = $Description
+    	$objForm.RootFolder = "Desktop"
+    	$objForm.Description = $Description
 	$Show = $objForm.ShowDialog()
 	If ($Show -eq "OK")
 	{
@@ -40,7 +38,6 @@ forEach($EV in $filesToConvert) {
 
 write-host Doing cleanup -ForegroundColor Green `n `n `n
 get-childitem $containingDir | where{$_.extension -eq ".doc" } | remove-item
-#dehydrate everything recently downloaded for this script FOR THE ONEDRIVE
 Set-location $containingDir
 attrib +U -P /S
 
