@@ -3,8 +3,8 @@ function Select-FileDialog
 	param([string]$Description,[string]$Directory,[string]$Filter="All Files (*.*)|*.*")
 	[System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
 	$objForm = New-Object System.Windows.Forms.FolderBrowserDialog
-    $objForm.RootFolder = "Desktop"
-    $objForm.Description = $Description
+    	$objForm.RootFolder = "Desktop"
+    	$objForm.Description = $Description
 	$Show = $objForm.ShowDialog()
 	If ($Show -eq "OK")
 	{
@@ -25,16 +25,15 @@ $wordInstance.Visible = $False
 $filesToConvert = Get-ChildItem $containingDir | where{$_.Extension -eq ".doc" } 
 
 if($filesToConvert){
-    write-host Found $filesToConvert.Count legacy docs in: $containingDir -ForegroundColor Green
-    forEach($EV in $filesToConvert) {
-            write-host "Converting :" $EV.fullname -ForegroundColor Green 
-            [ref]$name = Join-Path -Path $EV.DirectoryName -ChildPath $($EV.BaseName + ".docx")
-            $opendoc = $wordInstance.documents.open($EV.FullName)
-            $opendoc.saveas([ref]$name.Value, [ref]$saveFormat::wdFormatDocument)
-            $opendoc.saveas([ref]$name.Value, [ref]$SaveFormat::wdFormatDocument)
+    write-host Found $filesToConvert.Count legacy doc(s) in: $containingDir -ForegroundColor Green
+    forEach($file in $filesToConvert) {
+            write-host "Converting:" $file.fullname -ForegroundColor Green 
+            [ref]$name = Join-Path -Path $file.DirectoryName -ChildPath $($file.BaseName + ".docx")
+            $opendoc = $wordInstance.documents.open($file.FullName)
+            $opendoc.saveas([ref]$name.value, [ref]$saveFormat::wdFormatDocument)
             [ref]$saveFormat::wdFormatDocument
             $opendoc.close()
-            $EV = $null
+            $file = $null
         }
 
     $wordInstance.quit()
@@ -45,9 +44,9 @@ if($filesToConvert){
     Remove-Variable wordInstance
 
 write-host All Done! Closing in 15 seconds! -ForegroundColor Green 
-sleep -Seconds 15
+sleep -seconds 15
 }
 else{
     write-host No legacy files detected in $containingDir
-    sleep -Seconds 15
+    sleep -seconds 15
 }
