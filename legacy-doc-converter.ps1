@@ -3,8 +3,8 @@ function Select-FileDialog
 	param([string]$Description,[string]$Directory,[string]$Filter="All Files (*.*)|*.*")
 	[System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
 	$objForm = New-Object System.Windows.Forms.FolderBrowserDialog
-    	$objForm.RootFolder = "Desktop"
-    	$objForm.Description = $Description
+    $objForm.RootFolder = "Desktop"
+    $objForm.Description = $Description
 	$Show = $objForm.ShowDialog()
 	If ($Show -eq "OK")
 	{
@@ -17,6 +17,7 @@ function Select-FileDialog
 }
 
 $containingDir = Select-FileDialog -Description "Pick containing folder of legacy documents..."
+$outputDir = New-Item -ItemType directory -Path $($containingDir + "\converted\")
 
 [ref]$SaveFormat = "microsoft.office.interop.word.WdSaveFormat" -as [type]
 $wordInstance = new-object -ComObject Word.Application
@@ -25,10 +26,10 @@ $wordInstance.Visible = $False
 $filesToConvert = Get-ChildItem $containingDir | where{$_.Extension -eq ".doc" } 
 
 if($filesToConvert){
-    write-host Found $filesToConvert.Count legacy doc(s) in: $containingDir -ForegroundColor Green
+    write-host Found $filesToConvert.Count legacy files in: $containingDir -ForegroundColor Green
     forEach($file in $filesToConvert) {
             write-host "Converting:" $file.fullname -ForegroundColor Green 
-            [ref]$name = Join-Path -Path $file.DirectoryName -ChildPath $($file.BaseName + ".docx")
+            [ref]$name = Join-Path -Path $outputDir -ChildPath $($file.BaseName + ".docx")
             $opendoc = $wordInstance.documents.open($file.FullName)
             $opendoc.saveas([ref]$name.value, [ref]$saveFormat::wdFormatDocument)
             [ref]$saveFormat::wdFormatDocument
